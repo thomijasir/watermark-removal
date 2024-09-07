@@ -3,7 +3,7 @@
 import sys
 from pathlib import Path
 
-import imageio
+import imageio.v3 as iio
 import numpy as np
 from scipy.ndimage import gaussian_filter
 
@@ -19,7 +19,7 @@ if __name__ == "__main__":
     root = Path(sys.argv[1])
     buff = []
     for p in root.glob("output_*.png"):
-        buff.append(imageio.imread(p))
+        buff.append(iio.imread(p))
     images = np.array(buff)
 
     # Compute the gradients
@@ -32,7 +32,7 @@ if __name__ == "__main__":
     threshold = 10
     salient = ((mean_dx > threshold) | (mean_dy > threshold)).astype(float)
     salient = normalize(gaussian_filter(salient, sigma=3))
-    mask = ((salient > 0.2) * 255).astype(np.uint8)
+    mask = ((salient > 0.1) * 255).astype(np.uint8)
 
     # Saved the computed mask
-    imageio.imsave(root / "mask.png", mask)
+    iio.imwrite(root / "mask.png", mask)

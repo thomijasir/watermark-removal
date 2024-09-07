@@ -2,10 +2,13 @@
 
 set -eo pipefail
 
+# Generate timestamp
+timestamp=$(date +"%Y-%m-%d_%H%M")
+
 # Prepare output name
 file_no_ext="${1%.*}"
 extension="${1##*.}"
-def_name="$file_no_ext""_cleaned.""$extension"
+def_name="${file_no_ext}_cleaned_${timestamp}.${extension}"
 output_file="${2:-$def_name}"
 
 # Get first few key frames
@@ -35,7 +38,7 @@ if [[ "$counter" -lt 2 ]]; then
 fi
 
 echo "Extracting watermark..."
-./get_watermark.py "$tmpdir"
+./get_watermark_opencv.py "$tmpdir"
 
 echo "Removing watermark in video..."
 ffmpeg -hide_banner -loglevel warning -y -stats -i "$1" -acodec copy -vf "removelogo=$tmpdir/mask.png" "$output_file"
